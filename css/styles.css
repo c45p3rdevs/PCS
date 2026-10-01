@@ -1,0 +1,1026 @@
+/* =========================================================================
+   SISTEMA DE DISEÑO — "Carnicería" PWA
+   Inspirado en: papel de estraza, tableros de pizarra de precios, sellos de
+   inspección de carne y básculas digitales. Solo fuentes del sistema
+   (sin CDN) para garantizar que la app se vea igual con o sin internet.
+   ========================================================================= */
+
+:root {
+  /* Paleta */
+  --paper: #f1e7d0;
+  --paper-2: #e7d9b9;
+  --paper-3: #ddcba4;
+  --charcoal: #241f1b;
+  --charcoal-2: #35302a;
+  --oxblood: #7a2426;
+  --oxblood-dark: #5a1a1c;
+  --brass: #b07c3e;
+  --brass-light: #d7a85e;
+  --sello-verde: #45633f;
+  --sello-rojo: #b14328;
+  --sello-ambar: #b0791f;
+  --linea: rgba(36, 31, 27, 0.16);
+
+  /* Tipografía — todas del sistema, disponibles sin internet */
+  --f-display: "Roboto Condensed", "Arial Narrow", "Noto Sans", sans-serif;
+  --f-body:
+    -apple-system, system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --f-data: "Roboto Mono", "Courier New", monospace;
+
+  --radius: 3px;
+  --shadow-card:
+    0 1px 0 rgba(36, 31, 27, 0.06), 0 4px 14px rgba(36, 31, 27, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--paper);
+  color: var(--charcoal);
+  font-family: var(--f-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(36, 31, 27, 0.045) 1px,
+    transparent 0
+  );
+  background-size: 14px 14px;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 16px;
+}
+button {
+  cursor: pointer;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--f-display);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: var(--brass-light);
+  color: var(--charcoal);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* ---------- Utilidades ---------- */
+.oculto {
+  display: none !important;
+}
+.mono {
+  font-family: var(--f-data);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Pantalla de carga ---------- */
+#pantalla-carga {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+}
+.spinner-sello {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid var(--paper-3);
+  border-top-color: var(--oxblood);
+  animation: girar 0.9s linear infinite;
+}
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- LOGIN (ESTILO UI MODERNO PRO) ---------- */
+#vista-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* Fondo estilo Mesh Gradient Oscuro de alta tecnología */
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(108, 92, 231, 0.25) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(46, 204, 113, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(122, 36, 38, 0.2) 0px, transparent 50%);
+  position: relative;
+}
+
+.tarjeta-login {
+  width: 100%;
+  max-width: 400px;
+  /* Efecto Glassmorphism sutil sobre el fondo oscuro */
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px; /* Bordes redondeados y suaves estilo Dashboard */
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(255, 255, 255, 0.1);
+  padding: 40px 36px;
+  position: relative;
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.contenedor-logo-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.logo-login {
+  width: 70%; /* Tamaño balanceado para el contenedor moderno */
+  max-width: 220px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.tarjeta-login h1 {
+  text-align: center;
+  font-family: var(
+    --f-body
+  ); /* Cambiado a la fuente principal para mayor elegancia */
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1a202c;
+  margin-bottom: 6px;
+}
+
+.tarjeta-login .subt {
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 32px;
+  opacity: 1;
+}
+
+.campo {
+  margin-bottom: 20px;
+}
+
+.campo label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 8px;
+  text-transform: none; /* Adiós a las mayúsculas rígidas anteriores */
+  letter-spacing: 0;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 10px; /* Inputs curvos y modernos */
+  color: #1a202c;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: #6c5ce7; /* Tono morado UI Premium sincronizado con tus Reportes */
+  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+}
+
+/* Ajuste específico para los botones primarios dentro del contenedor del Login */
+#vista-login .btn-primario {
+  background: #6c5ce7;
+  color: #ffffff;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 4px 14px rgba(108, 92, 231, 0.25);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+#vista-login .btn-primario:hover {
+  background: #5b4cc4;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.35);
+  filter: none;
+}
+
+#vista-login .btn-primario:active {
+  transform: scale(0.98);
+}
+
+/* Mensajes de feedback modernizados */
+.error-msg {
+  background: #fff5f5;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.ok-msg {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+/* ---------- APP SHELL ---------- */
+#app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.barra-lateral {
+  width: 92px;
+  background: var(--charcoal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  flex-shrink: 0;
+}
+.marca-lateral {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--brass-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  color: var(--brass-light);
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 11px;
+}
+.nav-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  flex: 1;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 4px;
+  color: rgba(241, 231, 208, 0.55);
+  border-left: 3px solid transparent;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  width: 100%;
+}
+.nav-item svg {
+  width: 21px;
+  height: 21px;
+}
+.nav-item.activo {
+  color: var(--paper);
+  border-left-color: var(--oxblood);
+  background: rgba(122, 36, 38, 0.18);
+}
+.nav-item:hover {
+  color: var(--paper);
+}
+
+.btn-salir {
+  margin-top: auto;
+  background: none;
+  border: none;
+  color: rgba(241, 231, 208, 0.4);
+  padding: 12px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+.btn-salir:hover {
+  color: var(--sello-rojo);
+}
+.btn-salir svg {
+  width: 19px;
+  height: 19px;
+}
+
+.contenido-principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.barra-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--linea);
+  background: var(--paper);
+}
+.barra-superior h2 {
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.usuario-actual {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--charcoal-2);
+}
+.usuario-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brass-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--charcoal);
+  font-family: var(--f-display);
+}
+
+.zona-vista {
+  padding: 24px 28px 60px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ---------- Tarjetas / grid ---------- */
+.rejilla {
+  display: grid;
+  gap: 16px;
+}
+.rejilla-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.rejilla-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.rejilla-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.tarjeta {
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+}
+.tarjeta-kpi .kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--charcoal-2);
+  opacity: 0.65;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.tarjeta-kpi .kpi-valor {
+  font-family: var(--f-data);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.tarjeta-kpi .kpi-valor.acento {
+  color: var(--oxblood);
+}
+
+.seccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 28px 0 14px;
+}
+.seccion-header h3 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Sello de estado (elemento distintivo) ---------- */
+.sello {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transform: rotate(-2deg);
+}
+.sello::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sello-ok {
+  color: var(--sello-verde);
+}
+.sello-bajo {
+  color: var(--sello-ambar);
+}
+.sello-agotado {
+  color: var(--sello-rojo);
+}
+
+/* ---------- Tablas ---------- */
+.tabla-wrap {
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--charcoal-2);
+  opacity: 0.6;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-bottom: 1.5px solid var(--linea);
+  background: var(--paper-2);
+}
+tbody td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--linea);
+  font-size: 14px;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: rgba(176, 124, 62, 0.06);
+}
+.celda-num {
+  font-family: var(--f-data);
+  font-variant-numeric: tabular-nums;
+}
+.acciones-fila {
+  display: flex;
+  gap: 8px;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: var(--radius);
+  color: var(--charcoal-2);
+  opacity: 0.7;
+}
+.icon-btn:hover {
+  opacity: 1;
+  background: var(--paper-2);
+}
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.vacio {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--charcoal-2);
+  opacity: 0.55;
+}
+.vacio svg {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+
+/* ---------- Formularios / Modal ---------- */
+.overlay-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 31, 27, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+.modal {
+  background: var(--paper);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 460px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--linea);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--linea);
+}
+.modal-header h3 {
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.modal-cerrar {
+  background: none;
+  border: none;
+  color: var(--charcoal-2);
+  padding: 4px;
+}
+.modal-body {
+  padding: 20px 22px;
+}
+.modal-footer {
+  padding: 16px 22px;
+  border-top: 1px solid var(--linea);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ---------- Lector de báscula (elemento distintivo) ---------- */
+.lector-bascula {
+  background: var(--charcoal);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.lector-bascula .valor {
+  font-family: var(--f-data);
+  font-size: 30px;
+  font-weight: 700;
+  color: #e8543c;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 8px rgba(232, 84, 60, 0.5);
+}
+.lector-bascula .unidad {
+  font-family: var(--f-data);
+  font-size: 13px;
+  color: rgba(241, 231, 208, 0.5);
+}
+
+/* Selector de producto en venta */
+.selector-productos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.chip-producto {
+  border: 1.5px solid var(--paper-3);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chip-producto.sel {
+  border-color: var(--oxblood);
+  background: rgba(122, 36, 38, 0.06);
+}
+.chip-producto .nom {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.chip-producto .precio {
+  font-family: var(--f-data);
+  font-size: 12px;
+  color: var(--charcoal-2);
+  opacity: 0.75;
+}
+
+.metodo-pago-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.chip-pago {
+  flex: 1;
+  border: 1.5px solid var(--paper-3);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 10px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.chip-pago.sel {
+  border-color: var(--brass);
+  background: rgba(176, 124, 62, 0.1);
+  color: var(--brass);
+}
+
+.carrito-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--linea);
+  font-size: 13.5px;
+}
+.carrito-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 0 4px;
+  font-family: var(--f-display);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.carrito-total .val {
+  font-family: var(--f-data);
+  font-size: 22px;
+  color: var(--oxblood);
+}
+
+/* ---------- Responsive: tablet en vertical / celular ---------- */
+@media (max-width: 860px) {
+  .rejilla-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rejilla-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rejilla-2 {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .selector-productos {
+    grid-template-columns: 1fr;
+  }
+  .barra-lateral {
+    width: 72px;
+  }
+  .nav-item span {
+    display: none;
+  }
+  .zona-vista {
+    padding: 18px 14px 50px;
+  }
+  .barra-superior {
+    padding: 14px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- Componentes de Gráficas Nativas (Reportes) Stylizados UI Pro ---------- */
+.selector-tiempo {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.selector-tiempo .chip-pago {
+  border: none;
+  background: #fff;
+  color: var(--charcoal-2);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+.selector-tiempo .chip-pago.sel {
+  background: #6c5ce7; /* Morado UI premium de tu imagen */
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+.contenedor-grafica-pro {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-top: 16px;
+}
+.grafica-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.leyenda-grafica {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--charcoal-2);
+}
+.leyenda-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+/* Estilo Pro para las tarjetas de los reportes */
+.tarjeta-reporte {
+  background: #ffffff;
+  border: none;
+  border-radius: 20px; /* Bordes suaves estilo Dashboard moderno */
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+.tarjeta-reporte h3 {
+  font-family: var(--f-body);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  letter-spacing: 0;
+}
+
+.grafica-contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  min-height: 180px;
+}
+
+.grafica-fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grafica-label {
+  width: 80px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--charcoal-2);
+  text-transform: capitalize;
+}
+
+.grafica-barras-wrapper {
+  flex: 1;
+}
+
+.grafica-barra-linea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-2);
+  border-radius: 4px;
+  padding: 4px;
+  position: relative;
+}
+
+.barra-dinamica {
+  height: 24px;
+  border-radius: 3px;
+  transition: width 0.4s ease-out;
+}
+
+/* Colores basados en tus variables del sistema */
+.barra-dinamica.ganancias {
+  background: var(--oxblood);
+}
+
+.barra-dinamica.ventas {
+  background: var(--brass);
+}
+
+.grafica-val-mono {
+  font-family: var(--f-data);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--charcoal);
+  white-space: nowrap;
+}
+
+/* Contenedor Principal del Dashboard */
+.dashboard-container {
+  background-color: #f8f9fa;
+  padding: 24px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Grilla de Tarjetas KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #edf2f7;
+  position: relative;
+}
+
+/* Línea morada en la tarjeta activa inferior */
+.kpi-card.active-border {
+  border-bottom: 3px solid #6c5ce7;
+}
+
+/* Iconos circulares superiores en las tarjetas */
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 16px;
+}
+.color-purple {
+  background: #f3e8ff;
+  color: #6c5ce7;
+}
+.color-green {
+  background: #dcfce7;
+  color: #2ecc71;
+}
+.color-blue {
+  background: #e0f2fe;
+  color: #38bdf8;
+}
+.color-red {
+  background: #fee2e2;
+  color: #f87171;
+}
+
+.kpi-card h3 {
+  font-size: 28px;
+  margin: 8px 0 4px;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.kpi-card p {
+  color: #718096;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+
+.kpi-trend {
+  font-size: 12px;
+  font-weight: bold;
+}
+.trend-up {
+  color: #2ecc71;
+}
+.trend-down {
+  color: #e53e3e;
+}
+
+/* Contenedor del Gráfico */
+.chart-section {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #edf2f7;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-header h4 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 16px;
+}
+
+.chart-date {
+  color: #a0aec0;
+  font-size: 13px;
+}
+
+.chart-body {
+  position: relative;
+  height: 300px; /* Ajusta la altura del área de la gráfica */
+  width: 100%;
+}
+
+/* ESTILOS PARA EL LOGO EN LA BARRA LATERAL */
+.contenedor-logo-lateral {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 15px 10px; /* Espaciado interno para que respire */
+  box-sizing: border-box;
+  margin-bottom: 10px; /* Separación con el primer botón de menú */
+}
+
+.logo-lateral {
+  width: 90%; /* Ocupa casi todo el ancho de la barra */
+  max-width: 180px; /* Límite para que no se vea gigante si la barra es ancha */
+  height: auto; /* Mantiene la proporción perfecta */
+  object-fit: contain;
+  display: block;
+}
